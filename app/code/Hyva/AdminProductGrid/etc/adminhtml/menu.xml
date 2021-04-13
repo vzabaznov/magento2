@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Hyva_AdminProductGrid::catalog_products"
+             title="Products (Hyvä Admin)"
+             translate="title"
+             module="Hyva_AdminProductGrid"
+             sortOrder="11"
+             parent="Magento_Catalog::inventory"
+             action="hyva_admin_productgrid/index/index"
+             resource="Magento_Catalog::products"/>
+    </menu>
+</config>

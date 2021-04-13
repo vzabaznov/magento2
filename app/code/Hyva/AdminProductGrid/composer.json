@@ -1,0 +1,23 @@
+{
+  "name": "hyva/module-admin-product-grid",
+  "version": "0.0.1",
+  "description": "Alternative Magento 2 Admin Product Grid usable on extra large instances.",
+  "type": "magento2-module",
+  "require": {
+    "magento/framework": "*",
+    "hyva-themes/module-magento2-admin": "*",
+    "magento/module-backup": "100.4.*",
+    "magento/module-catalog": "104.0.*"
+  },
+  "license": [
+    "BSD-3-Clause"
+  ],
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Hyva\\AdminProductGrid\\": ""
+    }
+  }
+}

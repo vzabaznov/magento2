@@ -70,3 +70,5 @@ atlassian*
 /generated/*
 !/generated/.htaccess
 .DS_Store
+.env
+/app/code/Hyva/Admin/.git

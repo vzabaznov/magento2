@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="grid">
+        <xs:complexType>
+            <xs:all>
+                <xs:element name="source" type="source" minOccurs="1" maxOccurs="1"/>
+                <xs:element name="massActions" type="massAction" minOccurs="0"/>
+                <xs:element name="actions" type="actions" minOccurs="0"/>
+                <xs:element name="columns" type="columns" minOccurs="0"/>
+                <xs:element name="navigation" type="navigation" minOccurs="0"/>
+                <xs:element name="entityConfig" type="entityConfig" minOccurs="0"/>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:simpleType name="phpTypeAndMethod">
+        <xs:annotation>
+            <xs:documentation>A PHP Class or Interface name and a method name, separated by two colons.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:normalizedString">
+            <xs:pattern value="\\?[A-Z][a-zA-Z0-9]*(\\[A-Z][A-Za-z0-9]*)*::[a-z][A-Za-z]+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="phpType">
+        <xs:annotation>
+            <xs:documentation>A PHP Class or Interface name, with or without the leading backslash.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:normalizedString">
+            <xs:pattern value="\\?[A-Z][a-zA-Z0-9]*(\\[A-Z][A-Za-z0-9]*)*"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="paramName">
+        <xs:annotation>
+            <xs:documentation>Zero or more letters or numbers or underscore, starting with a letter.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:normalizedString">
+            <xs:pattern value="[a-z]?[A-Za-z0-9_]*"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="source">
+        <xs:sequence>
+            <xs:choice minOccurs="1" maxOccurs="1">
+                <xs:element name="repositoryListMethod" type="phpTypeAndMethod"/>
+                <xs:element name="arrayProvider" type="phpType"/>
+                <xs:element name="collection" type="phpType"/>
+                <xs:element name="query" type="queryType"/>
+            </xs:choice>
+            <xs:element name="defaultSearchCriteriaBindings" type="searchCriteriaBindingsType" minOccurs="0"
+                        maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="type">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="array"/>
+                    <xs:enumeration value="repository"/>
+                    <xs:enumeration value="collection"/>
+                    <xs:enumeration value="query"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="massAction">
+        <xs:sequence>
+            <xs:element name="action" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:complexContent>
+                        <xs:extension base="baseActionType">
+                            <xs:attribute name="requireConfirmation" type="boolean"/>
+                        </xs:extension>
+                    </xs:complexContent>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="idColumn" type="xs:normalizedString"/>
+        <xs:attribute name="idsParam" type="xs:normalizedString"/>
+    </xs:complexType>
+
+    <xs:complexType name="actions">
+        <xs:sequence>
+            <xs:element name="action" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:complexContent>
+                        <xs:extension base="baseActionType">
+                            <xs:attribute name="idParam">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:pattern value="[a-zA-Z_]+"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:attribute>
+                        </xs:extension>
+                    </xs:complexContent>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="idColumn" type="xs:normalizedString"/>
+    </xs:complexType>
+
+    <xs:complexType name="columns">
+        <xs:all>
+            <xs:element name="include" type="includeColumns" minOccurs="0"/>
+            <xs:element name="exclude" type="excludeColumns" minOccurs="0"/>
+        </xs:all>
+        <xs:attribute name="rowAction" type="xs:normalizedString"/>
+    </xs:complexType>
+    <xs:complexType name="includeColumns">
+        <xs:annotation>
+            <xs:documentation>
+                By default all columns from the source are included in the grid.
+                Setting include-columns will exclude all others by default.
+                To change this behavior, the keepAllSourceColumns attribute can be set to true.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="column" minOccurs="0" maxOccurs="unbounded" type="includeColumn"/>
+        </xs:sequence>
+        <xs:attribute name="keepAllSourceColumns" type="boolean">
+            <xs:annotation>
+                <xs:documentation>
+                    If set to true, all columns available on the grid source will be included in the grid, even if
+                    some include columns are defined.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="includeColumn">
+        <xs:sequence>
+            <xs:element name="option" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:attribute name="value" use="required" type="xs:string"/>
+                    <xs:attribute name="label" use="required" type="xs:string"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:normalizedString" use="required"/>
+        <xs:attribute name="type" type="xs:normalizedString"/>
+        <xs:attribute name="template" type="templateType"/>
+        <xs:attribute name="rendererBlockName" type="xs:normalizedString"/>
+        <xs:attribute name="label" type="xs:string"/>
+        <xs:attribute name="sortOrder" type="xs:integer"/>
+        <xs:attribute name="sortable" type="boolean"/>
+        <xs:attribute name="renderAsUnsecureHtml" type="boolean"/>
+        <xs:attribute name="source" type="phpType"/>
+        <xs:attribute name="initiallyHidden" type="boolean"/>
+    </xs:complexType>
+
+    <xs:complexType name="baseActionType">
+        <xs:attribute name="id" type="xs:string" use="required"/>
+        <xs:attribute name="label" type="xs:string" use="required"/>
+        <xs:attribute name="url" use="required" type="routeType"/>
+    </xs:complexType>
+
+    <xs:simpleType name="routeType">
+        <xs:annotation>
+            <xs:documentation>The Magento three-part route/controller/action syntax. A * indicates the current value.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="(\*|[a-zA-Z0-9_]+)/((\*|[a-zA-Z0-9_/]+)/)?(\*|[a-zA-Z0-9/]+)?"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="templateType">
+        <xs:annotation>
+            <xs:documentation>A fully qualified module name and a template file path within a modules
+                view/[are]/templates/ folder, separeted by two colons.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:normalizedString">
+            <xs:pattern value="[A-Z][a-zA-Z0-9]*_[A-Z][a-zA-Z0-9]*::[a-zA-Z/.-]+\.phtml"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="boolean">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="excludeColumns">
+        <xs:sequence>
+            <xs:element name="column" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:attribute name="name" use="required" type="xs:normalizedString"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="entityConfig">
+        <xs:sequence>
+            <xs:element name="label" minOccurs="0">
+                <xs:complexType>
+                    <xs:all>
+                        <xs:element name="singular" type="xs:string" minOccurs="0"/>
+                        <xs:element name="plural" type="xs:string" minOccurs="0"/>
+                    </xs:all>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="navigation">
+        <xs:all>
+            <xs:element name="pager" type="pagerType" minOccurs="0"/>
+            <xs:element name="sorting" type="sortingType" minOccurs="0"/>
+            <xs:element name="filters" type="filtersType" minOccurs="0"/>
+            <xs:element name="buttons" type="buttonsType" minOccurs="0"/>
+            <xs:element name="exports" type="exportType" minOccurs="0" />
+        </xs:all>
+        <xs:attribute name="useAjax" type="boolean"/>
+    </xs:complexType>
+
+    <xs:complexType name="pagerType">
+        <xs:all>
+            <xs:element name="defaultPageSize" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:integer">
+                        <xs:minInclusive value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="pageSizes" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="( *[0-9]+,?)+"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:all>
+        <xs:attribute name="enabled" type="boolean"/>
+    </xs:complexType>
+
+    <xs:complexType name="sortingType">
+        <xs:all>
+            <xs:element name="defaultSortByColumn" type="xs:normalizedString" minOccurs="0"/>
+            <xs:element name="defaultSortDirection" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="asc"/>
+                        <xs:enumeration value="desc"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="filtersType">
+        <xs:sequence>
+            <xs:element name="filter" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="option" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="value" minOccurs="1" maxOccurs="unbounded" type="xs:string"/>
+                                </xs:sequence>
+                                <xs:attribute name="label" use="required" type="xs:string"/>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="column" type="xs:normalizedString" use="required"/>
+                    <xs:attribute name="enabled" type="boolean"/>
+                    <xs:attribute name="template" type="templateType"/>
+                    <xs:attribute name="filterType" type="phpType"/>
+                    <xs:attribute name="source" type="phpType"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="buttonsType">
+        <xs:sequence>
+            <xs:element name="button" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:attribute name="id" type="xs:normalizedString" use="required"/>
+                    <xs:attribute name="label" type="xs:string"/>
+                    <xs:attribute name="url" type="routeType"/>
+                    <xs:attribute name="onclick" type="xs:string"/>
+                    <xs:attribute name="enabled" type="boolean"/>
+                    <xs:attribute name="template" type="templateType"/>
+                    <xs:attribute name="sortOrder" type="xs:int"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="exportType">
+        <xs:sequence>
+            <xs:element name="export" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:attribute name="type" type="xs:normalizedString" use="required"/>
+                    <xs:attribute name="label" type="xs:string"/>
+                    <xs:attribute name="fileName" type="xs:string"/>
+                    <xs:attribute name="enabled" type="boolean"/>
+                    <xs:attribute name="class" type="phpType"/>
+                    <xs:attribute name="sortOrder" type="xs:int"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="searchCriteriaBindingsType">
+        <xs:sequence>
+            <xs:element name="field" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:attribute name="name" type="paramName"/>
+                    <xs:attribute name="requestParam" type="paramName"/>
+                    <xs:attribute name="method" type="phpTypeAndMethod"/>
+                    <xs:attribute name="param" type="paramName"/>
+                    <xs:attribute name="property" type="paramName"/>
+                    <xs:attribute name="condition" type="conditionType"/>
+                    <xs:attribute name="value" type="xs:string"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="conditionType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="eq"/>
+            <xs:enumeration value="is"/>
+            <xs:enumeration value="neq"/>
+            <xs:enumeration value="lteq"/>
+            <xs:enumeration value="to"/>
+            <xs:enumeration value="gteq"/>
+            <xs:enumeration value="moreeq"/>
+            <xs:enumeration value="from"/>
+            <xs:enumeration value="gt"/>
+            <xs:enumeration value="lt"/>
+            <xs:enumeration value="like"/>
+            <xs:enumeration value="nlike"/>
+            <xs:enumeration value="in"/>
+            <xs:enumeration value="nin"/>
+            <xs:enumeration value="notnull"/>
+            <xs:enumeration value="null"/>
+            <xs:enumeration value="finset"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="selectJoinTypes">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="inner"/>
+            <xs:enumeration value="left"/>
+            <xs:enumeration value="right"/>
+            <xs:enumeration value="full"/>
+            <xs:enumeration value="cross"/>
+            <xs:enumeration value="natural"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+
+    <xs:complexType name="queryType">
+        <xs:sequence>
+            <xs:element name="select" type="querySelectType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="unionSelect" type="querySelectType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="unionSelectType">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="all"/>
+                    <xs:enumeration value="distinct"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="querySelectType">
+        <xs:sequence>
+            <xs:element name="from" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                    <xs:attribute name="table" type="xs:normalizedString" use="required"/>
+                    <xs:attribute name="as" type="xs:normalizedString"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="columns" type="querySelectColumnsType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="join" type="selectJoinType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="groupBy" type="queryGroupByColumnsType" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="querySelectColumnsType">
+        <xs:sequence>
+            <xs:element name="column" type="selectColumnType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="expression" type="selectExpressionType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="queryGroupByColumnsType">
+        <xs:sequence>
+            <xs:element name="column" type="groupByColumnType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="groupByColumnType">
+        <xs:attribute name="name" type="columnNameType" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="selectColumnType">
+        <xs:attribute name="name" type="columnNameType" use="required"/>
+        <xs:attribute name="as" type="columnNameType"/>
+    </xs:complexType>
+
+    <xs:simpleType name="columnNameType">
+        <xs:restriction base="xs:normalizedString">
+            <xs:pattern value="[a-zA-Z_][a-zA-Z0-9_-]*"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="selectJoinType">
+        <xs:sequence>
+            <xs:element name="on" type="xs:string"/>
+            <xs:element name="columns" type="queryGroupByColumnsType" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="type" type="selectJoinTypes"/>
+        <xs:attribute name="table" type="xs:normalizedString" use="required"/>
+        <xs:attribute name="as" type="xs:normalizedString"/>
+    </xs:complexType>
+
+    <xs:complexType name="selectExpressionType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="as" type="columnNameType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+</xs:schema>

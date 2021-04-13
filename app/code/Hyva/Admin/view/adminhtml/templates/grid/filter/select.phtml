@@ -1,0 +1,20 @@
+<?php declare(strict_types=1);
+
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Hyva\Admin\ViewModel\HyvaGrid\GridFilterInterface $filter */
+
+?>
+<select name="<?= $escaper->escapeHtmlAttr($filter->getInputName()) ?>"
+        form="<?= $filter->getFormId() ?>"
+        class="form-select w-full"
+        @change="formGridUpdate($event.target.form)"
+>
+    <option value=""> </option>
+<?php foreach ($filter->getOptions() as $option): ?>
+<?php $isSelected = $filter->getValue() === $option->getValueId() ?>
+<option value="<?= $escaper->escapeHtmlAttr($option->getValueId()) ?>"
+        <?= $isSelected ? 'selected' : '' ?>
+><?= $escaper->escapeHtml($option->getLabel()) ?></option>
+<?php endforeach; ?>
+</select>

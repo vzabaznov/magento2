@@ -1,0 +1,36 @@
+
+.hyva-admin-grid {
+    input, select {
+        @apply text-base;
+        @apply border-container-darker;
+
+        @apply bg-white;
+        @apply border;
+        @apply hover:bg-container-lighter;
+        @apply items-center;
+        @apply py-2;
+
+        @apply rounded-md;
+        @apply text-primary-lighter;
+    }
+
+    [type="checkbox"] {
+        @apply box-border;
+        @apply p-0;
+        @apply w-6;
+        @apply h-6;
+    }
+
+    .form-checkbox:checked {
+        background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M5.707 7.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4a1 1 0 0 0-1.414-1.414L7 8.586 5.707 7.293z'/%3e%3c/svg%3e");
+        border-color: transparent;
+        background-color: currentColor;
+        background-size: 100% 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .form-select {
+        @apply cursor-pointer;
+    }
+}

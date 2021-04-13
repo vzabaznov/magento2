@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<grid xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Hyva_Admin:etc/hyva-grid.xsd">
+    <source>
+        <repositoryListMethod>\Magento\Catalog\Api\ProductRepositoryInterface::getList</repositoryListMethod>
+    </source>
+    <columns>
+        <include>
+            <column name="id" sortOrder="10"/>
+            <column name="sku" sortOrder="20"/>
+            <column name="name" initiallyHidden="true"/>
+            <column name="image" type="magento_product_image" renderAsUnsecureHtml="true" label="Main Image"/>
+            <column name="price" type="price"/>
+        </include>
+    </columns>
+    <entityConfig>
+        <label>
+            <singular>Product</singular>
+            <plural>Products</plural>
+        </label>
+    </entityConfig>
+    <navigation>
+        <filters>
+            <filter column="id"/>
+            <filter column="sku"/>
+        </filters>
+    </navigation>
+</grid>
